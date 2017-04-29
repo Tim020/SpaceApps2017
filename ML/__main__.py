@@ -15,5 +15,7 @@ np_dataset = np.array(csv_dataset[1:], dtype="unicode")
 
 print(np_dataset)
 
+dates = open("dates.txt", 'w')
 
-
+for date in np_dataset[:, 2:]:
+    dates.writelines(date[0][3:5] + '\n')
