@@ -1,0 +1,54 @@
+#map {
+    display: block;
+    position: relative;
+    margin: auto;
+}
+
+#main {
+    min-width: 75%;
+    min-height: 75%;
+    max-height: 90%;
+    max-width: 90%;
+}
+
+.well {
+    padding: 10px;
+    display: block;
+    position: relative;
+    margin: auto;
+    background-color: #E0E0E0;
+}
+
+.dropdown {
+    left: 50%;
+    right: auto;
+    text-align: center;
+    transform: translate(-50%, 0);
+}
+
+h2.name {
+    text-align: center;
+    padding: 10px;
+}
+
+p.name {
+    text-align: center;
+    padding: 10px;
+}
+
+#submit {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+center-block.img-responsive.species {
+    max-width: 100%;
+    max-height: 100%;
+    padding: 15px;
+}
+
+[class*="span"].centred {
+    margin-left: auto;
+    margin-right: auto;
+    float: none;
+}

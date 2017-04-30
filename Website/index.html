@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>MyGration</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
+          integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/locate.css">
+    <link href="css/bootstrap-slider.css" rel="stylesheet">
+
+</head>
+<body>
+
+<div class="container-fluid">
+    <h1 align="middle">MyGration - Locate your species!</h1>
+</div>
+<div class="container-fluid" id="main">
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select Species
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu text-center">
+                        <li><a href="#" onclick="loadDataSet('Turtle')">Leatherback Turtle</a></li>
+                        <li><a href="#" onclick="loadDataSet('Dolphin')">Bottlenose Dolphin</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <h2 class="name" id="speciesname"></h2>
+            </div>
+            <div class="row">
+                <p class="name" id="description"></p>
+            </div>
+        </div>
+        <div class="col">
+            <div class="row">
+                <div id="map" style="width:512px;height:512px"></div>
+            </div>
+            <div class="row">
+                <div class="well">
+                    <div class="col" style="text-align: center">
+                        <input id="monthSlider" type="text" data-slider-min="0" data-slider-max="11"
+                               data-slider-step="1"
+                               data-slider-value="0"/>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col" style="text-align: center">
+                    <span id="monthCurrentSliderValLabel">Month: <span id="monthSliderVal">January</span></span>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="row">
+                <div class="col-6 text-center">
+                    <button type="button" class="btn btn-primary">Known Sightings</button>
+                </div>
+                <div class="col-6 text-center">
+                    <button type="button" class="btn btn-primary">Predicted Sightings</button>
+                </div>
+            </div>
+            <div class="row" id="submit">
+                <div class="col-6 text-center">
+                    <button type="button" class="btn btn-primary" onclick="newSighting()">I've spotted one!</button>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="span9 centred">
+                    <img class="center-block img-responsive species" id="speciesimage" src="res/MyGration-Logo.png" width="350" height="350">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"
+        integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb"
+        crossorigin="anonymous"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
+        integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
+        crossorigin="anonymous"></script>
+
+<script src="js/bootstrap-slider.js"></script>
+
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB2SQXcVnK48uHlF45zaqw7wMNuyI6W8kk&callback=initMap">
+</script>
+
+<script>
+    var map, infoWindow, markers = [], scientific_name = "", common_name = "", month = 0, json;
+
+    function generateMarkers(monthID) {
+        for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);
+            markers[i] = null;
+        }
+        markers = [];
+        for (var i = 0; i < json.features.length; i++) {
+            if (json.features[i].properties.date != "") {
+                var d = new Date(json.features[i].properties.date);
+                if (d.getMonth() == monthID) {
+                    var coords = json.features[i].geometry.coordinates;
+                    var latLng = new google.maps.LatLng(coords[1], coords[0])
+                    var marker = new google.maps.Marker({
+                        position: latLng,
+                        map: map
+                    });
+                    markers.push(marker)
+                }
+            }
+        }
+    }
+
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: -34.397, lng: 150.644},
+            zoom: 9
+        });
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                var marker = new google.maps.Marker({
+                    position: pos,
+                    // map: map,
+                    title: 'Current Location'
+                });
+                map.setCenter(pos);
+            }, function () {
+                handleLocationError(true, infoWindow, map.getCenter());
+            });
+        } else {
+            // Browser doesn't support Geolocation
+            handleLocationError(false, infoWindow, map.getCenter());
+        }
+    }
+
+    function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+            'Error: The Geolocation service failed.' :
+            'Error: Your browser doesn\'t support geolocation.');
+        infoWindow.open(map);
+    }
+
+    var species = (function () {
+        var json = null;
+        $.ajax({
+            'async': false,
+            'global': false,
+            'url': "data/species.json",
+            'dataType': "json",
+            'success': function (data) {
+                json = data;
+            }
+        });
+        return json;
+    })();
+
+    function loadDataSet(name) {
+        var dataset = null;
+        var index = 0;
+        for (var i = 0; i < species.length; i++) {
+            if (species[i].species == name) {
+                index = i;
+                break;
+            }
+        }
+        $.ajax({
+            'async': false,
+            'global': false,
+            'url': species[index].data,
+            'dataType': "json",
+            'success': function (data) {
+                dataset = data;
+            }
+        });
+        json = dataset;
+        document.getElementById("speciesname").innerHTML = species[index].common;
+        document.getElementById("description").innerHTML = species[index].description;
+        document.getElementById("speciesimage").src = species[index].image;
+        document.getElementById("speciesimage").width = 350;
+        document.getElementById("speciesimage").height = 350;
+        generateMarkers(month);
+    }
+
+    var monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    $("#monthSlider").slider();
+    $("#monthSlider").on('slide', function (slideEvt) {
+        $("#monthSliderVal").text(monthNames[slideEvt.value]);
+        generateMarkers(slideEvt.value);
+        month = slideEvt.value;
+    });
+
+    function newSighting() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                var date = new Date();
+                var year = date.getFullYear();
+                var monthstr = (date.getUTCMonth() < 10 ? "0" : "") + date.getUTCMonth();
+                var day = (date.getUTCDate() < 10 ? "0" : "") + date.getUTCDate();
+                var hour = (date.getUTCHours() < 10 ? "0" : "") + date.getUTCHours();
+                var min = (date.getUTCMinutes() < 10 ? "0" : "") + date.getUTCMinutes();
+                var sec = (date.getUTCSeconds() < 10 ? "0" : "") + date.getUTCSeconds();
+                var datestr = year + "-" + monthstr + "-" + day + " " + hour + ":" + min + ":" + sec + ":" + (date.getTimezoneOffset() / 60)
+                var sighting = '{"geometry" : {"type" : "Point", "coordinates" : [' + pos.lng + ", " + pos.lat + ']}, "type" : "Feature", "properties" : {"common" : "' + common_name + '", "scientific" : "' + scientific_name + '", "date" : "' + datestr + '"}}'
+                json.features.push(JSON.parse(sighting));
+                generateMarkers(monthstr);
+            })
+        }
+    }
+</script>
+</body>
+</html>
