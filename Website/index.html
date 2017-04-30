@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Locate</title>
+    <title>MyGration</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
 
@@ -15,14 +15,47 @@
 <body>
 
 <div class="container-fluid">
-    <h1 align="middle">Locate your species!</h1>
+    <h1 align="middle">MyGration - Locate your species!</h1>
 </div>
 <div class="container-fluid" id="main">
     <div class="row">
         <div class="col">
-            <p>Species information here</p>
+            <div class="row">
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select Species
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu text-center">
+                        <li><a href="#" onclick="loadDataSet('Turtle')">Leatherback Turtle</a></li>
+                        <li><a href="#" onclick="loadDataSet('Dolphin')">Bottlenose Dolphin</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <h2 class="name" id="speciesname"></h2>
+            </div>
+            <div class="row">
+                <p class="name" id="description"></p>
+            </div>
         </div>
-        <div id="map" style="width:512px;height:512px"></div>
+        <div class="col">
+            <div class="row">
+                <div id="map" style="width:512px;height:512px"></div>
+            </div>
+            <div class="row">
+                <div class="well">
+                    <div class="col" style="text-align: center">
+                        <input id="monthSlider" type="text" data-slider-min="0" data-slider-max="11"
+                               data-slider-step="1"
+                               data-slider-value="0"/>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col" style="text-align: center">
+                    <span id="monthCurrentSliderValLabel">Month: <span id="monthSliderVal">January</span></span>
+                </div>
+            </div>
+        </div>
         <div class="col">
             <div class="row">
                 <div class="col-6 text-center">
@@ -32,27 +65,19 @@
                     <button type="button" class="btn btn-primary">Predicted Sightings</button>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="well">
-            <div class="col" style="text-align: center">
-                <input id="monthSlider" type="text" data-slider-min="0" data-slider-max="11" data-slider-step="1"
-                       data-slider-value="0"/>
+            <div class="row" id="submit">
+                <div class="col-6 text-center">
+                    <button type="button" class="btn btn-primary" onclick="newSighting()">I've spotted one!</button>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="span9 centred">
+                    <img class="center-block img-responsive species" id="speciesimage" src="res/MyGration-Logo.png" width="350" height="350">
+                </div>
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col" style="text-align: center">
-            <span id="monthCurrentSliderValLabel">Month: <span id="monthSliderVal">January</span></span>
-        </div>
-    </div>
 </div>
-<div>
-    <button type="button" class="btn btn-primary" onclick="newSighting()">I've spotted one!</button>
-</div>
-
-<div id="test"></div>
 
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 
@@ -71,7 +96,7 @@
 </script>
 
 <script>
-    var map, infoWindow, markers = [], scientific_name = "", common_name = "", month = 0;
+    var map, infoWindow, markers = [], scientific_name = "", common_name = "", month = 0, json;
 
     function generateMarkers(monthID) {
         for (var i = 0; i < markers.length; i++) {
@@ -113,7 +138,6 @@
                     title: 'Current Location'
                 });
                 map.setCenter(pos);
-                generateMarkers(0);
             }, function () {
                 handleLocationError(true, infoWindow, map.getCenter());
             });
@@ -131,12 +155,12 @@
         infoWindow.open(map);
     }
 
-    var json = (function () {
+    var species = (function () {
         var json = null;
         $.ajax({
             'async': false,
             'global': false,
-            'url': "data/dolphin_geo.json",
+            'url': "data/species.json",
             'dataType': "json",
             'success': function (data) {
                 json = data;
@@ -144,6 +168,33 @@
         });
         return json;
     })();
+
+    function loadDataSet(name) {
+        var dataset = null;
+        var index = 0;
+        for (var i = 0; i < species.length; i++) {
+            if (species[i].species == name) {
+                index = i;
+                break;
+            }
+        }
+        $.ajax({
+            'async': false,
+            'global': false,
+            'url': species[index].data,
+            'dataType': "json",
+            'success': function (data) {
+                dataset = data;
+            }
+        });
+        json = dataset;
+        document.getElementById("speciesname").innerHTML = species[index].common;
+        document.getElementById("description").innerHTML = species[index].description;
+        document.getElementById("speciesimage").src = species[index].image;
+        document.getElementById("speciesimage").width = 350;
+        document.getElementById("speciesimage").height = 350;
+        generateMarkers(month);
+    }
 
     var monthNames = ["January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
@@ -176,9 +227,6 @@
             })
         }
     }
-    //{"geometry": {"type": "Point", "coordinates": [135.9250031, -34.73332977]},
-    // "type": "Feature", "properties": {"common": "Bottlenose Dolphin", "scientific": "Tursiops truncatus",
-    // "date": "", "lat": -34.73332977, "provider": "SAMA", "lng": 135.9250031}}
 </script>
 </body>
 </html>
