@@ -121,15 +121,6 @@
         integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
         crossorigin="anonymous"></script>
 <script src="js/bootstrap-slider.js"></script>
-<script type='text/javascript'>
-    var monthNames = ["January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    ];
-    $("#monthSlider").slider();
-    $("#monthSlider").on('slide', function (slideEvt) {
-        $("#monthSliderVal").text(monthNames[slideEvt.value]);
-    });
-</script>
 <script>
     var json = (function() {
         var json = null;
@@ -144,6 +135,15 @@
         });
         return json;
     })();
+
+    var monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    $("#monthSlider").slider();
+    $("#monthSlider").on('slide', function (slideEvt) {
+        $("#monthSliderVal").text(monthNames[slideEvt.value]);
+        console.log(json[0].scientific)
+    });
 </script>
 </body>
 </html>
