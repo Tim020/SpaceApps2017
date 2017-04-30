@@ -25,8 +25,8 @@
                     <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select Species
                         <span class="caret"></span></button>
                     <ul class="dropdown-menu text-center">
-                        <li><a href="#" onclick="loadDataSet('Turtle')">Leatherback Turtle</a></li>
-                        <li><a href="#" onclick="loadDataSet('Dolphin')">Bottlenose Dolphin</a></li>
+                        <li><a href="#" onclick="setSpeciesID('Turtle')">Leatherback Turtle</a></li>
+                        <li><a href="#" onclick="setSpeciesID('Dolphin')">Bottlenose Dolphin</a></li>
                     </ul>
                 </div>
             </div>
@@ -59,10 +59,11 @@
         <div class="col">
             <div class="row">
                 <div class="col-6 text-center">
-                    <button type="button" class="btn btn-primary">Known Sightings</button>
+                    <button type="button" class="btn btn-primary" onclick="loadDataSetKnown()">Known Sightings</button>
                 </div>
                 <div class="col-6 text-center">
-                    <button type="button" class="btn btn-primary">Predicted Sightings</button>
+                    <button type="button" class="btn btn-primary" onclick="loadDataSetPredicted()">Predicted Sightings
+                    </button>
                 </div>
             </div>
             <div class="row" id="submit">
@@ -72,7 +73,8 @@
             </div>
             <div class="row text-center">
                 <div class="span9 centred">
-                    <img class="center-block img-responsive species" id="speciesimage" src="res/MyGration-Logo.png" width="350" height="350">
+                    <img class="center-block img-responsive species" id="speciesimage" src="res/MyGration-Logo.png"
+                         width="350" height="350">
                 </div>
             </div>
         </div>
@@ -96,27 +98,50 @@
 </script>
 
 <script>
-    var map, infoWindow, markers = [], scientific_name = "", common_name = "", month = 0, json;
+    var map, infoWindow, markers = [], circles = [], scientific_name = "", common_name = "", month = 0, json, index,
+        isknown;
 
-    function generateMarkers(monthID) {
+    function generateMarkers(monthID, known) {
         for (var i = 0; i < markers.length; i++) {
             markers[i].setMap(null);
             markers[i] = null;
         }
+        for (var i = 0; i < circles.length; i++) {
+            circles[i].setMap(null);
+            circles[i] = null;
+        }
         markers = [];
-        for (var i = 0; i < json.features.length; i++) {
-            if (json.features[i].properties.date != "") {
-                var d = new Date(json.features[i].properties.date);
-                if (d.getMonth() == monthID) {
-                    var coords = json.features[i].geometry.coordinates;
-                    var latLng = new google.maps.LatLng(coords[1], coords[0])
-                    var marker = new google.maps.Marker({
-                        position: latLng,
-                        map: map
-                    });
-                    markers.push(marker)
+        circles = [];
+        if (known) {
+            for (var i = 0; i < json.features.length; i++) {
+                if (json.features[i].properties.date != "") {
+                    var d = new Date(json.features[i].properties.date);
+                    if (d.getMonth() == monthID) {
+                        var coords = json.features[i].geometry.coordinates;
+                        var latLng = new google.maps.LatLng(coords[1], coords[0]);
+                        var marker = new google.maps.Marker({
+                            position: latLng,
+                            map: map
+                        });
+                        markers.push(marker)
+                    }
                 }
             }
+        } else {
+            var lng = json[monthID.toString()].lng;
+            var lat = json[monthID.toString()].lat;
+            var rad = json[monthID.toString()].rad;
+            var circle = new google.maps.Circle({
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: '#FF0000',
+                fillOpacity: 0.35,
+                map: map,
+                center: new google.maps.LatLng(lat, lng),
+                radius: parseFloat(rad) * 45000
+            });
+            circles.push(circle)
         }
     }
 
@@ -169,15 +194,23 @@
         return json;
     })();
 
-    function loadDataSet(name) {
-        var dataset = null;
-        var index = 0;
+    function setSpeciesID(name) {
         for (var i = 0; i < species.length; i++) {
             if (species[i].species == name) {
                 index = i;
                 break;
             }
         }
+        document.getElementById("speciesname").innerHTML = species[index].common;
+        document.getElementById("description").innerHTML = species[index].description;
+        document.getElementById("speciesimage").src = species[index].image;
+        document.getElementById("speciesimage").width = 350;
+        document.getElementById("speciesimage").height = 350;
+    }
+
+    function loadDataSetKnown() {
+        var dataset = null;
+
         $.ajax({
             'async': false,
             'global': false,
@@ -188,21 +221,36 @@
             }
         });
         json = dataset;
-        document.getElementById("speciesname").innerHTML = species[index].common;
-        document.getElementById("description").innerHTML = species[index].description;
-        document.getElementById("speciesimage").src = species[index].image;
-        document.getElementById("speciesimage").width = 350;
-        document.getElementById("speciesimage").height = 350;
-        generateMarkers(month);
+        isknown = true;
+        generateMarkers(month, isknown);
+    }
+
+    function loadDataSetPredicted() {
+        var dataset = null;
+        console.log(index);
+
+        $.ajax({
+            'async': false,
+            'global': false,
+            'url': species[index].predictions,
+            'dataType': "json",
+            'success': function (data) {
+                dataset = data;
+            }
+        });
+        json = dataset;
+        isknown = false;
+        generateMarkers(month, isknown);
     }
 
     var monthNames = ["January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ];
+
     $("#monthSlider").slider();
     $("#monthSlider").on('slide', function (slideEvt) {
         $("#monthSliderVal").text(monthNames[slideEvt.value]);
-        generateMarkers(slideEvt.value);
+        generateMarkers(slideEvt.value, isknown);
         month = slideEvt.value;
     });
 
