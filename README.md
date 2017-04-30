@@ -12,6 +12,7 @@ Actions include:
 - Adding new viewings
 - Month by month comparisons
 - Interspecies comparisons
+- Monthly migration prediction areas
 
 Our GitHub Repo can be found here: https://github.com/Tim020/SpaceApps2017
 
