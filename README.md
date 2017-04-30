@@ -1,7 +1,9 @@
-# SpaceApps2017
-Migration stuff
+# MyGration
 MyGration is your personal migrating species tracker.
-Project Overview
+
+![Image of MyGration](https://github.com/Tim020/SpaceApps2017/blob/master/Website/res/MyGration-Logo.png)
+
+### Project Overview
 
 MyGration is your personal migrating species tracker. You can view previous sightings and add your own. Now sightings can be viewed Month by Month so you can ensure you have the best chance and location for a sighting.
 
@@ -13,7 +15,7 @@ Actions include:
 
 Our GitHub Repo can be found here: https://github.com/Tim020/SpaceApps2017
 
-Data sets and other information resources:
+## Data sets and other information resources:
 
 - Bottlenose Dolphin Information and Conservation: http://www.nationalgeographic.com/animals/mammals/c/common-bottlenose-dolphin/
 - Leatherback Turtle Information and Conservation: https://www.worldwildlife.org/species/leatherback-turtle
