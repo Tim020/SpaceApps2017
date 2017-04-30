@@ -1,0 +1,20 @@
+#map {
+    display: block;
+    position: relative;
+    margin: auto;
+}
+
+#main {
+    min-width: 75%;
+    min-height: 75%;
+    max-height: 90%;
+    max-width: 90%;
+}
+
+.well {
+    padding: 10px;
+    display: block;
+    position: relative;
+    margin: auto;
+    background-color: #E0E0E0;
+}

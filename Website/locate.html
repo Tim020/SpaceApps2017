@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Locate</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
+          integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/locate.css">
+    <link href="css/bootstrap-slider.css" rel="stylesheet">
+
+</head>
+<body>
+
+<div class="container-fluid">
+    <h1 align="middle">Locate your species!</h1>
+</div>
+<div class="container-fluid" id="main">
+    <div class="row">
+        <div class="col">
+            <p>Species information here</p>
+        </div>
+        <div id="map" style="width:512px;height:512px">
+            <script>
+                // Note: This example requires that you consent to location sharing when
+                // prompted by your browser. If you see the error "The Geolocation service
+                // failed.", it means you probably did not give permission for the browser to
+                // locate you.
+                var map, infoWindow;
+                function initMap() {
+                    map = new google.maps.Map(document.getElementById('map'), {
+                        center: {lat: -34.397, lng: 150.644},
+                        zoom: 9
+                    });
+                    // Try HTML5 geolocation.
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function (position) {
+                            var pos = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
+                            var marker = new google.maps.Marker({
+                                position: pos,
+                                map: map,
+                                title: 'Current Location'
+                            });
+                            map.setCenter(pos);
+                        }, function () {
+                            handleLocationError(true, infoWindow, map.getCenter());
+                        });
+                    } else {
+                        // Browser doesn't support Geolocation
+                        handleLocationError(false, infoWindow, map.getCenter());
+                    }
+                }
+                function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+                    infoWindow.setPosition(pos);
+                    infoWindow.setContent(browserHasGeolocation ?
+                        'Error: The Geolocation service failed.' :
+                        'Error: Your browser doesn\'t support geolocation.');
+                    infoWindow.open(map);
+                }
+            </script>
+            <script async defer
+                    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB2SQXcVnK48uHlF45zaqw7wMNuyI6W8kk&callback=initMap">
+            </script>
+        </div>
+        <div class="col">
+            <div class="row">
+                <div class="col-6 text-center">
+                    <button type="button" class="btn btn-primary">Known Sightings</button>
+                </div>
+                <div class="col-6 text-center">
+                    <button type="button" class="btn btn-primary">Predicted Sightings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="well">
+            <div class="col" style="text-align: center">
+                <input id="monthSlider" type="text" data-slider-min="0" data-slider-max="11" data-slider-step="1"
+                       data-slider-value="0"/>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col" style="text-align: center">
+            <span id="monthCurrentSliderValLabel">Month: <span id="monthSliderVal">January</span></span>
+        </div>
+    </div>
+</div>
+<div>
+    <button type="button" class="btn btn-primary" onclick="passLocation()">I've spotted one!</button>
+</div>
+
+<button>Get JSON data</button>
+<div id="test"></div>
+
+<script>
+    function passLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                document.getElementById("demo").innerHTML = pos.lat;
+                document.getElementById("demo2").innerHTML = pos.lng;
+            })
+        }
+    }
+</script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"
+        integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
+        integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
+        crossorigin="anonymous"></script>
+<script src="js/bootstrap-slider.js"></script>
+<script type='text/javascript'>
+    var monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    $("#monthSlider").slider();
+    $("#monthSlider").on('slide', function (slideEvt) {
+        $("#monthSliderVal").text(monthNames[slideEvt.value]);
+    });
+</script>
+<script>
+    var json = (function() {
+        var json = null;
+        $.ajax({
+            'async': false,
+            'global': false,
+            'url': "data/dolphin.json",
+            'dataType': "json",
+            'success': function (data) {
+                json = data;
+            }
+        });
+        return json;
+    })();
+</script>
+</body>
+</html>

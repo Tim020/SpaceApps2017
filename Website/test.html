@@ -4,7 +4,7 @@
     <style>
         /* Always set the map height explicitly to define the size of the div
          * element that contains the map. */
-        #map {
+        #map_container {
             height: 100%;
         }
         /* Optional: Makes the sample page fill the window. */
@@ -20,7 +20,7 @@
 <script>
     var map;
     function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
+        map = new google.maps.Map(document.getElementById('map_container'), {
             zoom: 2,
             center: new google.maps.LatLng(2.8,-187.3),
             mapTypeId: 'terrain'
