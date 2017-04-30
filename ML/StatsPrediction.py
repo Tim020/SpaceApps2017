@@ -4,6 +4,7 @@ from sklearn.cluster import  DBSCAN
 from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
+import os
 
 # Load turtle data from csv file
 file = open("Datasets/leatherbackturtle.csv", 'r')
@@ -22,7 +23,8 @@ for line in csv_file:
         first_run = False
 
 file.close()
-file = open("Datasets/leatherbackturtle_predictions.csv", 'w')
+os.mkdir("Datasets/Sightings By Month/")
+file = open("Datasets/Sightings By Month/leatherbackturtle.csv", 'w')
 csv_write = csv.writer(file, delimiter=',')
 month_data = []
 
