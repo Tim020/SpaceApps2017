@@ -49,7 +49,7 @@
     </div>
 </div>
 <div>
-    <button type="button" class="btn btn-primary" onclick="passLocation()">I've spotted one!</button>
+    <button type="button" class="btn btn-primary" onclick="newSighting()">I've spotted one!</button>
 </div>
 
 <div id="test"></div>
@@ -71,18 +71,27 @@
 </script>
 
 <script>
-    var map, infoWindow, markers = [];
-    
-    function passLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-                var pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-                document.getElementById("demo").innerHTML = pos.lat;
-                document.getElementById("demo2").innerHTML = pos.lng;
-            })
+    var map, infoWindow, markers = [], scientific_name = "", common_name = "", month = 0;
+
+    function generateMarkers(monthID) {
+        for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);
+            markers[i] = null;
+        }
+        markers = [];
+        for (var i = 0; i < json.features.length; i++) {
+            if (json.features[i].properties.date != "") {
+                var d = new Date(json.features[i].properties.date);
+                if (d.getMonth() == monthID) {
+                    var coords = json.features[i].geometry.coordinates;
+                    var latLng = new google.maps.LatLng(coords[1], coords[0])
+                    var marker = new google.maps.Marker({
+                        position: latLng,
+                        map: map
+                    });
+                    markers.push(marker)
+                }
+            }
         }
     }
 
@@ -100,10 +109,11 @@
                 };
                 var marker = new google.maps.Marker({
                     position: pos,
-                    map: map,
+                    // map: map,
                     title: 'Current Location'
                 });
                 map.setCenter(pos);
+                generateMarkers(0);
             }, function () {
                 handleLocationError(true, infoWindow, map.getCenter());
             });
@@ -141,27 +151,34 @@
     $("#monthSlider").slider();
     $("#monthSlider").on('slide', function (slideEvt) {
         $("#monthSliderVal").text(monthNames[slideEvt.value]);
-        for (var i = 0; i < markers.length; i++) {
-            markers[i].setMap(null);
-            markers[i] = null;
-        }
-        markers = [];
-        for (var i = 0; i < json.features.length; i++) {
-            if (json.features[i].properties.date != "") {
-                var d = new Date(json.features[i].properties.date);
-                if (d.getMonth() == slideEvt.value) {
-                    var coords = json.features[i].geometry.coordinates;
-                    var latLng = new google.maps.LatLng(coords[1], coords[0])
-                    var marker = new google.maps.Marker({
-                        position: latLng,
-                        map: map
-                    })
-                    markers.push(marker)
-                }
-            }
-        }
-
+        generateMarkers(slideEvt.value);
+        month = slideEvt.value;
     });
+
+    function newSighting() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                var date = new Date();
+                var year = date.getFullYear();
+                var monthstr = (date.getUTCMonth() < 10 ? "0" : "") + date.getUTCMonth();
+                var day = (date.getUTCDate() < 10 ? "0" : "") + date.getUTCDate();
+                var hour = (date.getUTCHours() < 10 ? "0" : "") + date.getUTCHours();
+                var min = (date.getUTCMinutes() < 10 ? "0" : "") + date.getUTCMinutes();
+                var sec = (date.getUTCSeconds() < 10 ? "0" : "") + date.getUTCSeconds();
+                var datestr = year + "-" + monthstr + "-" + day + " " + hour + ":" + min + ":" + sec + ":" + (date.getTimezoneOffset() / 60)
+                var sighting = '{"geometry" : {"type" : "Point", "coordinates" : [' + pos.lng + ", " + pos.lat + ']}, "type" : "Feature", "properties" : {"common" : "' + common_name + '", "scientific" : "' + scientific_name + '", "date" : "' + datestr + '"}}'
+                json.features.push(JSON.parse(sighting));
+                generateMarkers(monthstr);
+            })
+        }
+    }
+    //{"geometry": {"type": "Point", "coordinates": [135.9250031, -34.73332977]},
+    // "type": "Feature", "properties": {"common": "Bottlenose Dolphin", "scientific": "Tursiops truncatus",
+    // "date": "", "lat": -34.73332977, "provider": "SAMA", "lng": 135.9250031}}
 </script>
 </body>
 </html>
