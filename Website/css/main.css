@@ -1,0 +1,97 @@
+body {
+    background-color: #3E9BC8;
+}
+
+#main {
+    background-color: #61B7E0;
+    margin: 10px;
+}
+
+#title {
+    margin: 10px;
+    border: 10px;
+    text-align: center;
+}
+
+#content {
+    margin: 10px;
+}
+
+#species-info {
+    background-color: #89cdef;
+    margin: 10px;
+}
+
+#species-selection-button {
+    margin: 10px;
+}
+
+#species-name {
+    margin-bottom: 0px;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#species-desc {
+    margin-bottom: 10px;
+    margin-top: 0px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#map-content {
+    background-color: #B8E4F9;
+    margin: 10px;
+}
+
+#map {
+    display: block;
+    position: relative;
+    margin: 10px;
+}
+
+#misc-content {
+    background-color: #89cdef;
+    margin: 10px;
+}
+
+#buttons-1 {
+    margin: 10px;
+}
+
+#buttons-2 {
+    margin: 10px;
+}
+
+#species-img {
+    max-width: 100%;
+    max-height: 100%;
+    margin: 10px;
+}
+
+.dropdown {
+    left: 50%;
+    right: auto;
+    text-align: center;
+    transform: translate(-50%, 0);
+}
+
+h2.name {
+    text-align: center;
+    margin: 10px;
+}
+
+p.name {
+    text-align: center;
+    margin: 10px;
+}
+
+[class*="span"].centred {
+    margin: auto;
+    float: none;
+}
+
+.rounded{
+    border-radius: .75rem;
+}

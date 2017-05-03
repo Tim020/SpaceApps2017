@@ -5,59 +5,58 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
 
-    <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
           integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/locate.css">
-    <link href="css/bootstrap-slider.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/bootstrap-slider.css">
 
 </head>
-<body>
 
-<div class="container-fluid">
-    <h1 align="middle">MyGration - Locate your species!</h1>
-</div>
-<div class="container-fluid" id="main">
-    <div class="row">
-        <div class="col">
-            <div class="row">
-                <div class="dropdown">
+<body>
+<div class="rounded container-fluid" id="main">
+    <div class="row" id="title">
+        <div class="col-md-12 text-center" id="title-text">
+            <h1>MyGration - Locate your species!</h1>
+        </div>
+    </div>
+    <div class="row" id="content">
+        <div class="rounded col" id="species-info">
+            <div class="row" id="species-selection-button">
+                <div class="dropdown" id="dropdown-button">
                     <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select Species
                         <span class="caret"></span></button>
                     <ul class="dropdown-menu text-center">
-                        <li><a href="#" onclick="setSpeciesID('Turtle')">Leatherback Turtle</a></li>
-                        <li><a href="#" onclick="setSpeciesID('Dolphin')">Bottlenose Dolphin</a></li>
+                        <li><a href="#" onclick="setSpecies('Turtle')">Leatherback Turtle</a></li>
+                        <li><a href="#" onclick="setSpecies('Dolphin')">Bottlenose Dolphin</a></li>
                     </ul>
                 </div>
             </div>
-            <div class="row">
-                <h2 class="name" id="speciesname"></h2>
+            <div class="row" id="species-name">
+                <div class="col-12">
+                    <h2 class="name" id="speciesname"></h2>
+                </div>
             </div>
-            <div class="row">
-                <p class="name" id="description"></p>
+            <div class="row" id="species-desc">
+                <ul class="name" id="descriptions"></ul>
             </div>
         </div>
-        <div class="col">
+        <div class="rounded col" id="map-content">
+            <div class="rounded row" id="map" style="width:512px;height:512px"></div>
             <div class="row">
-                <div id="map" style="width:512px;height:512px"></div>
-            </div>
-            <div class="row">
-                <div class="well">
-                    <div class="col" style="text-align: center">
-                        <input id="monthSlider" type="text" data-slider-min="0" data-slider-max="11"
-                               data-slider-step="1"
-                               data-slider-value="0"/>
-                    </div>
+                <div class="col-12 text-center">
+                    <input id="monthSlider" type="text" data-slider-min="0" data-slider-max="11"
+                           data-slider-step="1"
+                           data-slider-value="0"/>
                 </div>
             </div>
             <div class="row">
-                <div class="col" style="text-align: center">
+                <div class="col-12 text-center">
                     <span id="monthCurrentSliderValLabel">Month: <span id="monthSliderVal">January</span></span>
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div class="row">
+        <div class="rounded col" id="misc-content">
+            <div class="row" id="buttons-1">
                 <div class="col-6 text-center">
                     <button type="button" class="btn btn-primary" onclick="loadDataSetKnown()">Known Sightings</button>
                 </div>
@@ -66,14 +65,14 @@
                     </button>
                 </div>
             </div>
-            <div class="row" id="submit">
+            <div class="row" id="buttons-2">
                 <div class="col-6 text-center">
-                    <button type="button" class="btn btn-primary" onclick="newSighting()">I've spotted one!</button>
+                    <button type="button" class="btn btn-primary" onclick="newSighting()">Report sighting</button>
                 </div>
             </div>
-            <div class="row text-center">
+            <div class="row text-center" id="species-img">
                 <div class="span9 centred">
-                    <img class="center-block img-responsive species" id="speciesimage" src="res/MyGration-Logo.png"
+                    <img class="rounded center-block img-responsive" id="speciesimage" src="res/MyGration-Logo.png"
                          width="350" height="350">
                 </div>
             </div>
@@ -194,7 +193,7 @@
         return json;
     })();
 
-    function setSpeciesID(name) {
+    function setSpecies(name) {
         for (var i = 0; i < species.length; i++) {
             if (species[i].species == name) {
                 index = i;
@@ -202,45 +201,61 @@
             }
         }
         document.getElementById("speciesname").innerHTML = species[index].common;
-        document.getElementById("description").innerHTML = species[index].description;
+        var textItems = species[index].description.split("\n");
+        var ul = document.getElementById("descriptions");
+        while (ul.firstChild) {
+            ul.removeChild(ul.firstChild);
+        }
+        for (var i = 0; i < textItems.length; i++) {
+            var li = document.createElement("li");
+            li.setAttribute("id", "info_" + i);
+            li.setAttribute("align", "justify");
+            li.appendChild(document.createTextNode(textItems[i]));
+            ul.appendChild(li);
+        }
+        //document.getElementById("description").innerHTML = species[index].description;
         document.getElementById("speciesimage").src = species[index].image;
         document.getElementById("speciesimage").width = 350;
         document.getElementById("speciesimage").height = 350;
     }
 
     function loadDataSetKnown() {
-        var dataset = null;
+        if (index != null) {
+            var dataset = null;
 
-        $.ajax({
-            'async': false,
-            'global': false,
-            'url': species[index].data,
-            'dataType': "json",
-            'success': function (data) {
-                dataset = data;
-            }
-        });
-        json = dataset;
-        isknown = true;
-        generateMarkers(month, isknown);
+            $.ajax({
+                'async': false,
+                'global': false,
+                'url': species[index].data,
+                'dataType': "json",
+                'success': function (data) {
+                    dataset = data;
+                }
+            });
+            json = dataset;
+            isknown = true;
+            generateMarkers(month, isknown);
+        }
     }
 
     function loadDataSetPredicted() {
-        var dataset = null;
-        console.log(index);
+        if (index != null) {
+            var dataset = null;
+            console.log(index);
 
-        $.ajax({
-            'async': false,
-            'global': false,
-            'url': species[index].predictions,
-            'dataType': "json",
-            'success': function (data) {
-                dataset = data;
-            }
-        });
-        json = dataset;
-        isknown = false;
-        generateMarkers(month, isknown);
+            $.ajax({
+                'async': false,
+                'global': false,
+                'url': species[index].predictions,
+                'dataType': "json",
+                'success': function (data) {
+                    dataset = data;
+                }
+            });
+            json = dataset;
+            isknown = false;
+            generateMarkers(month, isknown);
+        }
     }
 
     var monthNames = ["January", "February", "March", "April", "May", "June",
@@ -249,32 +264,79 @@
 
     $("#monthSlider").slider();
     $("#monthSlider").on('slide', function (slideEvt) {
-        $("#monthSliderVal").text(monthNames[slideEvt.value]);
-        generateMarkers(slideEvt.value, isknown);
-        month = slideEvt.value;
+        if (slideEvt.value != month) {
+            $("#monthSliderVal").text(monthNames[slideEvt.value]);
+            month = slideEvt.value;
+            if (index != null && json != null) {
+                generateMarkers(slideEvt.value, isknown);
+            }
+        }
     });
 
     function newSighting() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-                var pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-                var date = new Date();
-                var year = date.getFullYear();
-                var monthstr = (date.getUTCMonth() < 10 ? "0" : "") + date.getUTCMonth();
-                var day = (date.getUTCDate() < 10 ? "0" : "") + date.getUTCDate();
-                var hour = (date.getUTCHours() < 10 ? "0" : "") + date.getUTCHours();
-                var min = (date.getUTCMinutes() < 10 ? "0" : "") + date.getUTCMinutes();
-                var sec = (date.getUTCSeconds() < 10 ? "0" : "") + date.getUTCSeconds();
-                var datestr = year + "-" + monthstr + "-" + day + " " + hour + ":" + min + ":" + sec + ":" + (date.getTimezoneOffset() / 60)
-                var sighting = '{"geometry" : {"type" : "Point", "coordinates" : [' + pos.lng + ", " + pos.lat + ']}, "type" : "Feature", "properties" : {"common" : "' + common_name + '", "scientific" : "' + scientific_name + '", "date" : "' + datestr + '"}}'
-                json.features.push(JSON.parse(sighting));
-                generateMarkers(monthstr);
-            })
+//        if (index != null) {
+//            if (navigator.geolocation) {
+//                navigator.geolocation.getCurrentPosition(function (position) {
+//                    var pos = {
+//                        lat: position.coords.latitude,
+//                        lng: position.coords.longitude
+//                    };
+//                    var date = new Date();
+//                    var year = date.getFullYear();
+//                    var monthstr = (date.getUTCMonth() < 10 ? "0" : "") + date.getUTCMonth();
+//                    var day = (date.getUTCDate() < 10 ? "0" : "") + date.getUTCDate();
+//                    var hour = (date.getUTCHours() < 10 ? "0" : "") + date.getUTCHours();
+//                    var min = (date.getUTCMinutes() < 10 ? "0" : "") + date.getUTCMinutes();
+//                    var sec = (date.getUTCSeconds() < 10 ? "0" : "") + date.getUTCSeconds();
+//                    var datestr = year + "-" + monthstr + "-" + day + " " + hour + ":" + min + ":" + sec + ":" + (date.getTimezoneOffset() / 60)
+//                    var sighting = '{"geometry" : {"type" : "Point", "coordinates" : [' + pos.lng + ", " + pos.lat + ']}, "type" : "Feature", "properties" : {"common" : "' + common_name + '", "scientific" : "' + scientific_name + '", "date" : "' + datestr + '"}}'
+//                    console.log(JSON.parse(sighting));
+//                    json.features.push(JSON.parse(sighting));
+//                    generateMarkers(monthstr);
+//                })
+//            }
+//        }
+        if (index != null && isknown) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var pos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    var marker = new google.maps.Marker({
+                        position: pos,
+                        map: map,
+                    });
+                    markers.push(marker);
+                    $("#submitLocation").modal()
+                }, function () {
+                    handleLocationError(true, infoWindow, map.getCenter());
+                });
+            } else {
+                // Browser doesn't support Geolocation
+                handleLocationError(false, infoWindow, map.getCenter());
+            }
         }
     }
 </script>
+<div id="submitLocation" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <div class="col-md-12 text-center">
+                    <h4 class="modal-title">New Sighting Recorded</h4>
+                </div>
+            </div>
+            <div class="modal-body">
+                <p>Your sighting has been recorded, thank you!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
 </body>
 </html>
