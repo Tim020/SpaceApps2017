@@ -5,7 +5,9 @@ MyGration is your personal migrating species tracker.
 
 ### Project Overview
 
-MyGration is your personal migrating species tracker. You can view previous sightings and add your own. Now sightings can be viewed Month by Month so you can ensure you have the best chance and location for a sighting.
+MyGration is your personal migrating species tracker. Using our website, you can view all stored locations of each species and use this data to help predict movements over time using our machine learning algorithms. Previous sightings can easily be accessed and your own additions can be made to these large data sets to allow for more accurate prediction data.
+
+Now sightings can be viewed Month by Month so you can ensure you have the best chance and location for a sighting.
 
 Actions include:
 - Visualising Historic Data on Sightings
@@ -13,6 +15,11 @@ Actions include:
 - Month by month comparisons
 - Interspecies comparisons
 - Monthly migration prediction areas
+
+Future developments:
+
+Full crowd source of data
+Improved predictions of species migration using extra data such as global temperature reading and weather patterns
 
 Our GitHub Repo can be found here: https://github.com/Tim020/SpaceApps2017
 
